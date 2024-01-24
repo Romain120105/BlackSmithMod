@@ -1,8 +1,5 @@
 package fr.shoqapik.blacksmithmod.entity;
 
-import fr.shoqapik.blacksmithmod.BlackSmithMod;
-import fr.shoqapik.blacksmithmod.packets.BlackSmithShowDialogPacket;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -42,7 +39,6 @@ public class BlackSmithEntity extends Mob {
                 }
                 return InteractionResult.SUCCESS;
             }*/
-            BlackSmithMod.sendToClient(new BlackSmithShowDialogPacket(), (ServerPlayer) p_21472_);
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.PASS;

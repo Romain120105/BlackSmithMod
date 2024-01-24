@@ -1,9 +1,9 @@
 package fr.shoqapik.blacksmithmod.client;
 
 import fr.shoqapik.blacksmithmod.BlackSmithMod;
-import fr.shoqapik.blacksmithmod.client.gui.BlackSmithDialogScreen;
+import fr.shoqapik.blacksmithmod.client.gui.QuestDialogScreen;
 import fr.shoqapik.blacksmithmod.client.renderer.BlackSmithEntityRenderer;
-import fr.shoqapik.blacksmithmod.packets.BlackSmithShowDialogPacket;
+import fr.shoqapik.blacksmithmod.packets.ShowDialogPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
@@ -22,7 +22,7 @@ public class BlackSmithModClient {
     }
 
 
-    public static void handleDialogPacket(BlackSmithShowDialogPacket msg, Supplier<NetworkEvent.Context> ctx) {
-        Minecraft.getInstance().setScreen(new BlackSmithDialogScreen());
+    public static void handleDialogPacket(ShowDialogPacket msg, Supplier<NetworkEvent.Context> ctx) {
+        Minecraft.getInstance().setScreen(new QuestDialogScreen(msg.entityName, msg.dialogs, msg.answers));
     }
 }

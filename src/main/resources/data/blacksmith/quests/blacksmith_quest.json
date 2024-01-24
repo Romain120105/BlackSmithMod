@@ -1,0 +1,27 @@
+{
+  "entityId": "blacksmith:blacksmith_entity",
+  "dialogs": [
+    "If you don't see it already im the blacksmith and I will craft, repair and upgrade all kind of weapons, tools and armor of your need",
+    "Yeah yeah, i'm really a blacksmith",
+    "I'm a blacksmith who make blacksmith stuff",
+    "To sum up I'm a blacksmith"
+  ],
+  "answers": [
+    {
+      "formattedText": "Maybe later",
+      "action": "not implemented yet"
+    },
+    {
+      "formattedText": "Someday maybe",
+      "action": "not implemented yet"
+    },
+    {
+      "formattedText": "Not yet sry",
+      "action": "not implemented yet"
+    },
+    {
+      "formattedText": "Not now",
+      "action": "not implemented yet"
+    }
+  ]
+}
