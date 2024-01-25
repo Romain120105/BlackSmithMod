@@ -99,10 +99,7 @@ public class QuestDialogScreen extends Screen {
 
         drawCenteredString(p_96562_, font, entityname, x + imageWidth / 2, height - 100 + 15, 16777215);
 
-        p_96562_.pushPose();
-        p_96562_.scale(0.9F, 0.9F, 0.9F);
-        p_96562_.translate(20, 40, 0D);
-        drawWordWrap(Component.literal(currentLine), x + 5, height - 80 + 15, 265, 16777215, font, p_96562_);
+        drawWordWrap(Component.literal(currentLine), x + 5, height - 80 + 15, 240, 16777215, font, p_96562_);
 
 
         p_96562_.popPose();
@@ -122,7 +119,7 @@ public class QuestDialogScreen extends Screen {
 
         for (FormattedCharSequence formattedcharsequence : font.split(p_92858_, p_92861_)) {
             font.drawInternal(formattedcharsequence, (float) p_92859_, (float) p_92860_, p_92862_, matrix4f, false);
-            p_92860_ += 9;
+            p_92860_ += 11;
         }
 
     }

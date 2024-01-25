@@ -3,6 +3,7 @@ package fr.shoqapik.blacksmithmod;
 import fr.shoqapik.blacksmithmod.packets.ShowDialogPacket;
 import fr.shoqapik.blacksmithmod.quests.Quest;
 import fr.shoqapik.blacksmithmod.quests.QuestManager;
+import fr.shoqapik.blacksmithmod.recipe.RecipeManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.AddReloadListenerEvent;
@@ -27,6 +28,7 @@ public class CommonEvents {
     @SubscribeEvent
     public static void addQuestsData(AddReloadListenerEvent event){
         event.addListener(new QuestManager());
+        event.addListener(new RecipeManager());
     }
 
 
