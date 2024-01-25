@@ -20,7 +20,7 @@ public class CommonEvents {
         ResourceLocation entityId= ForgeRegistries.ENTITY_TYPES.getKey(event.getTarget().getType());
         Quest quest = QuestManager.getQuest(entityId);
         if(quest != null && event.getEntity() instanceof ServerPlayer){
-            BlackSmithMod.sendToClient(new ShowDialogPacket(event.getTarget().getDisplayName().getString(), quest.getDialogs(), quest.getAnswers()), (ServerPlayer) event.getEntity());
+            BlackSmithMod.sendToClient(new ShowDialogPacket(event.getTarget().getUUID(), event.getTarget().getDisplayName().getString(), quest.getDialogs(), quest.getAnswers()), (ServerPlayer) event.getEntity());
 
         }
     }

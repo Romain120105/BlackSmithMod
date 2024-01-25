@@ -6,23 +6,28 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Transformation;
 import fr.shoqapik.blacksmithmod.BlackSmithMod;
+import fr.shoqapik.blacksmithmod.packets.ActionPacket;
 import fr.shoqapik.blacksmithmod.quests.QuestAnswer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.CraftingScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraftforge.network.NetworkHooks;
 import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class QuestDialogScreen extends Screen {
     public static final ResourceLocation DIALOGS_LOCATION = new ResourceLocation(BlackSmithMod.MODID, "textures/gui/dialogs.png");
+    private UUID entityUUID;
     private String entityname;
     private List<String> dialogs = new ArrayList<>();
     private boolean typing;
@@ -38,8 +43,9 @@ public class QuestDialogScreen extends Screen {
     private Button declineQuestButton;
   */
 
-    public QuestDialogScreen(String entityName, List<String> dialogs, List<QuestAnswer> questAnswers) {
+    public QuestDialogScreen(UUID entityUUID, String entityName, List<String> dialogs, List<QuestAnswer> questAnswers) {
         super(Component.literal(entityName));
+        this.entityUUID = entityUUID;
         this.entityname = entityName;
         this.dialogs = dialogs;
         this.questAnswers = questAnswers;
@@ -55,12 +61,17 @@ public class QuestDialogScreen extends Screen {
                 if (index < questAnswers.size()) {
                     QuestAnswer questAnswer = questAnswers.get(index);
                     buttons.add(this.addRenderableWidget(new Button(380 + i * 110, y + j * 25, 100, 20, Component.literal(questAnswer.getFormattedAwnser()), (p_95981_) -> {
-                        this.dialogs.add("Not implemented yet! Come back later.");
-                        this.page = page + 1;
-                        this.declined = true;
-                        setButtonsEnabled(false);
-                        letterIndex = 0;
-                        currentLine = "";
+                        if(questAnswer.getAction().equals("open_craft")){
+                            Minecraft.getInstance().setScreen(null);
+                            BlackSmithMod.sendToServer(new ActionPacket(entityUUID, questAnswer.getAction()));
+                        }else {
+                            this.dialogs.add("Not implemented yet! Come back later.");
+                            this.page = page + 1;
+                            this.declined = true;
+                            setButtonsEnabled(false);
+                            letterIndex = 0;
+                            currentLine = "";
+                        }
                     })));
                     index += 1;
                 }

@@ -8,8 +8,8 @@
   ],
   "answers": [
     {
-      "formattedText": "Maybe later",
-      "action": "not implemented yet"
+      "formattedText": "I want to craft an item!",
+      "action": "open_craft"
     },
     {
       "formattedText": "Someday maybe",
