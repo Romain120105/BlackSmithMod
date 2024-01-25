@@ -3,7 +3,9 @@ package fr.shoqapik.blacksmithmod.client.gui;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.shoqapik.blacksmithmod.BlackSmithMod;
+import fr.shoqapik.blacksmithmod.client.widget.SmithRecipeButton;
 import fr.shoqapik.blacksmithmod.menu.SmithCraftMenu;
+import fr.shoqapik.blacksmithmod.recipe.BlackSmithRecipe;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
@@ -14,7 +16,7 @@ import net.minecraft.world.entity.player.Inventory;
 public class SmithCraftScreen extends AbstractContainerScreen<SmithCraftMenu> {
     private static final ResourceLocation CRAFTING_TABLE_LOCATION = new ResourceLocation(BlackSmithMod.MODID, "textures/gui/blacksmith_screen.png");
     private EditBox searchBox;
-
+    private SmithRecipeButton button;
 
 
     public SmithCraftScreen(SmithCraftMenu p_97741_, Inventory p_97742_, Component p_97743_) {
@@ -36,6 +38,9 @@ public class SmithCraftScreen extends AbstractContainerScreen<SmithCraftMenu> {
         this.searchBox.setVisible(true);
         this.searchBox.setTextColor(16777215);
         this.searchBox.setValue(s);
+
+        BlackSmithRecipe recipe = new BlackSmithRecipe("minecraft:diamond_sword");
+        button = new SmithRecipeButton(i+11, j+31, recipe);
     }
 
     @Override
@@ -48,6 +53,7 @@ public class SmithCraftScreen extends AbstractContainerScreen<SmithCraftMenu> {
         } else {
             this.searchBox.render(p_97795_, p_97796_, p_97797_, p_97798_);
         }
+        button.render(p_97795_, p_97796_, p_97797_, p_97798_);
     }
 
     @Override
@@ -81,7 +87,7 @@ public class SmithCraftScreen extends AbstractContainerScreen<SmithCraftMenu> {
 
     @Override
     public boolean keyPressed(int p_97765_, int p_97766_, int p_97767_) {
-        if(searchBox.isFocused() && this.searchBox.keyPressed(p_97765_, p_97766_, p_97767_)){
+        if(this.searchBox.isFocused() && this.searchBox.keyPressed(p_97765_, p_97766_, p_97767_)){
             return true;
         }
         return super.keyPressed(p_97765_, p_97766_, p_97767_);
