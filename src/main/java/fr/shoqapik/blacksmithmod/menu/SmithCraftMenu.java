@@ -3,10 +3,18 @@ package fr.shoqapik.blacksmithmod.menu;
 import fr.shoqapik.blacksmithmod.BlackSmithMod;
 import fr.shoqapik.blacksmithmod.menu.container.SmithCraftContainer;
 import fr.shoqapik.blacksmithmod.menu.slot.CraftInputSlot;
+import fr.shoqapik.blacksmithmod.recipe.BlackSmithRecipe;
+import fr.shoqapik.blacksmithmod.recipe.RecipeManager;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+
+import java.util.Map;
 
 public class SmithCraftMenu extends AbstractContainerMenu {
 
@@ -43,5 +51,38 @@ public class SmithCraftMenu extends AbstractContainerMenu {
     @Override
     public boolean stillValid(Player p_38874_) {
         return true;
+    }
+
+    public void placeRecipe(Player player, String item) {
+        BlackSmithRecipe recipe = RecipeManager.getRecipe(item);
+
+        for(int i = 0; i < 6; i++){
+            Slot slot = getSlot(i);
+            if(slot.hasItem()){
+                player.getInventory().add(slot.getItem());
+            }
+        }
+        if(recipe != null){
+            if(recipe.hasItems(player)){
+                int index = 0;
+                for(Map.Entry<String, Integer> requieredItem: recipe.getRequiredItems().entrySet()){
+                    Item minecraftItem = recipe.getItemStack(requieredItem.getKey()).getItem();
+                    int removed = 0;
+                    for(ItemStack stack : player.getInventory().items){
+                        if(stack.getItem() == minecraftItem){
+                            if(removed < requieredItem.getValue()) {
+                                int toRemove = requieredItem.getValue() - removed;
+                                if (toRemove > stack.getCount()) toRemove = stack.getCount();
+                                stack.shrink(toRemove);
+                                removed += toRemove;
+                            }
+                        }
+                    }
+                    this.getSlot(index).set(new ItemStack(minecraftItem, requieredItem.getValue()));
+                    index +=1;
+
+                }
+            }
+        }
     }
 }
