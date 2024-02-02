@@ -25,7 +25,6 @@ public class QuestManager extends SimpleJsonResourceReloadListener {
         BlackSmithRecipe recipe = new BlackSmithRecipe("minecraft:diamond_sword");
         recipe.getRequiredItems().put("minecraft:stick", 34);
         recipe.getRequiredItems().put("minecraft:diamond", 3);
-        System.out.println(GSON.toJson(recipe));
     }
 
     public static Quest getQuest(ResourceLocation entityId) {

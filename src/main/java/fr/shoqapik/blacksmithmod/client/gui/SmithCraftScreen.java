@@ -70,6 +70,7 @@ public class SmithCraftScreen extends AbstractContainerScreen<SmithCraftMenu> {
         this.forwardButton.initTextureValues(1, 182, 13, 18, CRAFTING_TABLE_LOCATION);
         this.backButton = new SmithStateSwitchingButton(i + 38, j + 137, 12, 17, true);
         this.backButton.initTextureValues(1, 182, 13, 18, CRAFTING_TABLE_LOCATION);
+        tabButtons.clear();
         for(RecipeCategory category : RecipeCategory.values()){
             this.tabButtons.add(new CategoryButton(category));
         }
@@ -92,6 +93,7 @@ public class SmithCraftScreen extends AbstractContainerScreen<SmithCraftMenu> {
         if(page < 0) page = 0;
         if(page * 20 > categoryRecipes.size()) page -= 1;
         categoryRecipes = RecipeManager.getRecipesFor(currentCategory);
+        removeLockedRecipes();
         if(!searchBox.getValue().isEmpty()){
             filterRecipes();
         }
@@ -119,6 +121,18 @@ public class SmithCraftScreen extends AbstractContainerScreen<SmithCraftMenu> {
             recipebooktabbutton.setStateTriggered(recipebooktabbutton.getCategory() == currentCategory);
         }
 
+    }
+
+    private void removeLockedRecipes(){
+        List<BlackSmithRecipe> toRemove = new ArrayList<>();
+        for(BlackSmithRecipe recipe : categoryRecipes){
+            if(!ClientRecipeLocker.get().hasRecipe(recipe.getCraftedItem())) {
+                toRemove.add(recipe);
+            }
+        }
+        for (BlackSmithRecipe recipe : toRemove){
+            categoryRecipes.remove(recipe);
+        }
     }
 
     private void filterRecipes(){

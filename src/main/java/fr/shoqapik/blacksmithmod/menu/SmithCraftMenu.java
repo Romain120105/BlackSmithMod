@@ -85,4 +85,6 @@ public class SmithCraftMenu extends AbstractContainerMenu {
             }
         }
     }
+
+
 }

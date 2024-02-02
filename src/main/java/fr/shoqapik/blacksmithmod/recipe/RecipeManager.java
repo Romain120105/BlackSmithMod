@@ -26,7 +26,7 @@ public class RecipeManager extends SimpleJsonResourceReloadListener {
     public RecipeManager() {
         super(GSON, "smith_recipes");
         List<ResourceLocation> items = ForgeRegistries.ITEMS.getKeys().stream().toList();
-        Random random = new Random();
+        /*Random random = new Random();
         for(int index = 0; index < 35; ++index) {
             String item = items.get(random.nextInt(items.size())).toString();
             BlackSmithRecipe recipe = new BlackSmithRecipe(item);
@@ -42,7 +42,7 @@ public class RecipeManager extends SimpleJsonResourceReloadListener {
         recipe1.setCategory(RecipeCategory.ARMORS);
         recipe1.getRequiredItems().put("minecraft:netherite_ingot", 2);
         recipes.add(recipe);
-        recipes.add(recipe1);
+        recipes.add(recipe1);*/
     }
 
     public static BlackSmithRecipe getRecipe(String recipe) {
@@ -56,6 +56,7 @@ public class RecipeManager extends SimpleJsonResourceReloadListener {
 
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> p_10793_, ResourceManager p_10794_, ProfilerFiller p_10795_) {
+       recipes.clear();
         for (Map.Entry<ResourceLocation, JsonElement> entry : p_10793_.entrySet()) {
             ResourceLocation resourcelocation = entry.getKey();
             try {
@@ -71,8 +72,6 @@ public class RecipeManager extends SimpleJsonResourceReloadListener {
             }
         }
     }
-
-
 
     public static List<BlackSmithRecipe> getRecipes() {
         return recipes;

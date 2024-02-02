@@ -2,6 +2,8 @@ package fr.shoqapik.blacksmithmod.client;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import fr.shoqapik.blacksmithmod.recipe.BlackSmithRecipe;
+import fr.shoqapik.blacksmithmod.recipe.RecipeManager;
 import net.minecraft.FileUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.item.ItemStack;
@@ -31,6 +33,8 @@ public class ClientRecipeLocker {
                     recipeFile.getParentFile().mkdirs();
                 }
                 recipeFile.createNewFile();
+                this.recipeObject = new ClientRecipeObject();
+                save();
             }
             recipeObject = gson.fromJson(FileUtils.readFileToString(recipeFile, StandardCharsets.UTF_8), ClientRecipeObject.class);
         }catch (IOException exception){
@@ -45,18 +49,37 @@ public class ClientRecipeLocker {
         }else{
             path += minecraft.getCurrentServer().ip;
         }
-        path += minecraft.player.getStringUUID()+".json";
+        path += "-"+minecraft.player.getStringUUID()+".json";
         return new File(path);
     }
 
-    public void discoverItem(ItemStack stack){
-        recipeObject.discoverItem(stack);
+    public boolean discoverItem(ItemStack stack){
+        boolean res = recipeObject.discoverItem(stack);
+        checkRecipes();
         save();
+        return res;
     }
 
     public void unlockRecipe(String recipe){
         recipeObject.unlockRecipe(recipe);
-        save();
+    }
+
+    private void checkRecipes(){
+        for(BlackSmithRecipe recipe : RecipeManager.getRecipes()){
+            boolean cancel = false;
+            for(String craftedItem : recipe.getRequiredItems().keySet()){
+                if(!this.recipeObject.hasItem(craftedItem)){
+                    cancel = true;
+                }
+            }
+            if(!cancel){
+                unlockRecipe(recipe.getCraftedItem());
+            }
+        }
+    }
+
+    public boolean hasRecipe(String craftedItem) {
+        return this.recipeObject.hasRecipe(craftedItem);
     }
 
     public void save(){
@@ -75,14 +98,26 @@ public class ClientRecipeLocker {
         private List<String> discoveredItems = new ArrayList<>();
         private List<String> unlockedRecipes = new ArrayList<>();
 
-        public void discoverItem(ItemStack stack){
-            discoveredItems.add(ForgeRegistries.ITEMS.getDelegate(stack.getItem()).toString());
+        public boolean discoverItem(ItemStack stack){
+            String key = ForgeRegistries.ITEMS.getKey(stack.getItem()).toString();
+            if(discoveredItems.contains(key)) return false;
+            discoveredItems.add(key);
+            return true;
         }
 
         public void unlockRecipe(String recipe){
-            unlockedRecipes.add(recipe);
+            if(!unlockedRecipes.contains(recipe)) {
+                unlockedRecipes.add(recipe);
+            }
         }
 
+        public boolean hasItem(String item){
+            return discoveredItems.contains(item);
+        }
+
+        public boolean hasRecipe(String recipe) {
+            return unlockedRecipes.contains(recipe);
+        }
     }
 
 }
