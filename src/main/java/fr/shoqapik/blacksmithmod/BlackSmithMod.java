@@ -7,12 +7,15 @@ import fr.shoqapik.blacksmithmod.packets.ActionPacket;
 import fr.shoqapik.blacksmithmod.packets.CraftItemPacket;
 import fr.shoqapik.blacksmithmod.packets.PlaceRecipePacket;
 import fr.shoqapik.blacksmithmod.packets.ShowDialogPacket;
+import fr.shoqapik.blacksmithmod.recipe.BlackSmithRecipe;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
@@ -39,6 +42,11 @@ public class BlackSmithMod {
     private static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, MODID);
     private static final DeferredRegister<MenuType<?>> CONTAINERS = DeferredRegister.create(ForgeRegistries.MENU_TYPES,
             MODID);
+    private static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(ForgeRegistries.RECIPE_TYPES,
+            MODID);
+    private static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS,
+            MODID);
+
     public static final RegistryObject<EntityType<BlackSmithEntity>> BLACKSMITH_ENTITY = ENTITIES.register("blacksmith_entity",
             () -> EntityType.Builder.of(BlackSmithEntity::new, MobCategory.CREATURE)
                     .sized(0.6F, 1.8F).fireImmune().updateInterval(1).build(MODID+":blacksmith_entity"));
@@ -50,6 +58,14 @@ public class BlackSmithMod {
                     return new SmithCraftMenu(p_39995_, p_39996_);
                 }
             }));
+    public static final RegistryObject<RecipeType<BlackSmithRecipe>> BLACKSMITH_RECIPE = RECIPE_TYPES.register("blacksmith",
+            () -> new RecipeType<>() {
+                public String toString() {
+                    return "blacksmith";
+                }
+            });
+    public static final RegistryObject<RecipeSerializer<BlackSmithRecipe>> BLACKSMITH_RECIPE_SERIALIZER = RECIPE_SERIALIZERS.register("blacksmith",
+            BlackSmithRecipe.Serializer::new);
 
     private static final String PROTOCOL_VERSION = "1";
     public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(
@@ -64,6 +80,8 @@ public class BlackSmithMod {
         MinecraftForge.EVENT_BUS.register(this);
         ENTITIES.register(bus);
         CONTAINERS.register(bus);
+        RECIPE_TYPES.register(bus);
+        RECIPE_SERIALIZERS.register(bus);
         INSTANCE.registerMessage(0, ShowDialogPacket.class, ShowDialogPacket::encode, ShowDialogPacket::decode, ShowDialogPacket::handle);
         INSTANCE.registerMessage(1, ActionPacket.class, ActionPacket::encode, ActionPacket::decode, ActionPacket::handle);
         INSTANCE.registerMessage(2, PlaceRecipePacket.class, PlaceRecipePacket::encode, PlaceRecipePacket::decode, PlaceRecipePacket::handle);

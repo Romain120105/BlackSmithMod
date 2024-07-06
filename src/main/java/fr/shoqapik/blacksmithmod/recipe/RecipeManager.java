@@ -46,17 +46,17 @@ public class RecipeManager extends SimpleJsonResourceReloadListener {
     }
 
     public static BlackSmithRecipe getRecipe(String recipe) {
-        for (BlackSmithRecipe entry : recipes) {
+        /*for (BlackSmithRecipe entry : recipes) {
             if (entry.getCraftedItem().equals(recipe)) {
                 return entry;
             }
-        }
+        }*/
         return null;
     }
 
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> p_10793_, ResourceManager p_10794_, ProfilerFiller p_10795_) {
-       recipes.clear();
+       /*recipes.clear();
         for (Map.Entry<ResourceLocation, JsonElement> entry : p_10793_.entrySet()) {
             ResourceLocation resourcelocation = entry.getKey();
             try {
@@ -70,11 +70,11 @@ public class RecipeManager extends SimpleJsonResourceReloadListener {
             } catch (IllegalArgumentException | JsonParseException jsonparseexception) {
                 LOGGER.error("Parsing error loading recipe {}", resourcelocation, jsonparseexception);
             }
-        }
+        }*/
 
     }
 
-    public static List<BlackSmithRecipe> getRecipes() {
+    /*public static List<BlackSmithRecipe> getRecipes() {
         return recipes;
     }
 
@@ -97,5 +97,5 @@ public class RecipeManager extends SimpleJsonResourceReloadListener {
         }
         return false;
 
-    }
+    }*/
 }
