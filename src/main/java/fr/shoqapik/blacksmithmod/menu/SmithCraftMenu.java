@@ -3,11 +3,12 @@ package fr.shoqapik.blacksmithmod.menu;
 import fr.shoqapik.blacksmithmod.BlackSmithMod;
 import fr.shoqapik.blacksmithmod.menu.container.SmithCraftContainer;
 import fr.shoqapik.blacksmithmod.menu.slot.CraftInputSlot;
+import fr.shoqapik.blacksmithmod.packets.CraftItemPacket;
+import fr.shoqapik.blacksmithmod.packets.PlaceRecipePacket;
 import fr.shoqapik.blacksmithmod.recipe.BlackSmithRecipe;
 import fr.shoqapik.blacksmithmod.recipe.RecipeManager;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
-import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
@@ -19,7 +20,7 @@ import java.util.Map;
 public class SmithCraftMenu extends AbstractContainerMenu {
 
     private final SmithCraftContainer craftSlots = new SmithCraftContainer(this, 3, 3);
-
+    public BlackSmithRecipe selectedRecipe = null;
 
     public SmithCraftMenu(int p_39356_, Inventory p_39357_) {
         super(BlackSmithMod.SMITH_CRAFT_MENU.get(), p_39356_);
@@ -43,14 +44,25 @@ public class SmithCraftMenu extends AbstractContainerMenu {
         }
     }
 
-    @Override
+    /*@Override
     public ItemStack quickMoveStack(Player p_38941_, int p_38942_) {
         return null;
+    }*/
+
+    @Override
+    public ItemStack quickMoveStack(Player player, int i) {
+        return ItemStack.EMPTY;
     }
 
     @Override
     public boolean stillValid(Player p_38874_) {
         return true;
+    }
+
+    @Override
+    public void removed(Player pPlayer) {
+        super.removed(pPlayer);
+        this.clearContainer(pPlayer, this.craftSlots);
     }
 
     public void placeRecipe(Player player, String item) {
@@ -80,9 +92,39 @@ public class SmithCraftMenu extends AbstractContainerMenu {
                     }
                     this.getSlot(index).set(new ItemStack(minecraftItem, requieredItem.getValue()));
                     index +=1;
-
                 }
             }
+        }
+    }
+
+    public void craftItemClient() {
+        if(selectedRecipe == null) return;
+        BlackSmithMod.sendToServer(new CraftItemPacket(selectedRecipe.getCraftedItem()));
+        selectedRecipe = null;
+    }
+
+    public void craftItemServer(ServerPlayer serverPlayer, String craftedItem) {
+        BlackSmithRecipe recipe = RecipeManager.getRecipe(craftedItem);
+        if(recipe != null && recipe.hasItems(this)) {
+            //this.craftSlots.clearContent();
+            for(int i = 0; i < this.craftSlots.getContainerSize(); ++i) {
+                Inventory inventory = serverPlayer.getInventory();
+                if (inventory.player instanceof ServerPlayer) {
+                    this.craftSlots.removeItem(i, this.craftSlots.getItem(i).getCount());
+                }
+            }
+
+            ItemStack result = recipe.getCraftedItemStack().copy();
+            boolean bl = serverPlayer.getInventory().add(result);
+            ItemEntity itemEntity;
+            if(!bl && !result.isEmpty()) {
+                itemEntity = serverPlayer.drop(result, false);
+                if (itemEntity != null) {
+                    itemEntity.setNoPickUpDelay();
+                    itemEntity.setOwner(serverPlayer.getUUID());
+                }
+            }
+
         }
     }
 

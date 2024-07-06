@@ -26,7 +26,9 @@ import net.minecraft.client.gui.screens.recipebook.RecipeButton;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
@@ -35,7 +37,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SmithCraftScreen extends AbstractContainerScreen<SmithCraftMenu> {
+
     public static final ResourceLocation CRAFTING_TABLE_LOCATION = new ResourceLocation(BlackSmithMod.MODID, "textures/gui/blacksmith_screen.png");
+
+    private final SmithCraftMenu containerMenu;
     private RecipeCategory currentCategory = RecipeCategory.ALL;
     private EditBox searchBox;
     private String previousSearchText = "";
@@ -47,8 +52,10 @@ public class SmithCraftScreen extends AbstractContainerScreen<SmithCraftMenu> {
     private SmithRecipeButton hoveredButton;
     private List<CategoryButton> tabButtons = new ArrayList<>();
     private Button craftButton;
-    public SmithCraftScreen(SmithCraftMenu p_97741_, Inventory p_97742_, Component p_97743_) {
-        super(p_97741_, p_97742_, p_97743_);
+
+    public SmithCraftScreen(SmithCraftMenu containerMenu, Inventory inventory, Component component) {
+        super(containerMenu, inventory, component);
+        this.containerMenu = containerMenu;
         this.imageWidth = 329;
         this.imageHeight = 166;
         this.inventoryLabelX = 161;
@@ -78,13 +85,13 @@ public class SmithCraftScreen extends AbstractContainerScreen<SmithCraftMenu> {
         updateTabs();
         this.craftButton = new Button(i + 250, j + 60, 65, 20, Component.literal("Craft"), new Button.OnPress() {
             @Override
-            public void onPress(Button p_93751_) {
-                Minecraft.getInstance().setScreen(null);
+            public void onPress(Button button) {
+                BlackSmithMod.LOGGER.error("TESTEEEEEE");
+                SmithCraftScreen.this.containerMenu.craftItemClient();
+                SmithCraftScreen.this.craftButton.active = false;
             }
         });
         this.craftButton.active = false;
-
-
     }
 
     private void refreshButtons(){
@@ -209,20 +216,23 @@ public class SmithCraftScreen extends AbstractContainerScreen<SmithCraftMenu> {
     }
 
     @Override
-    public boolean mouseClicked(double p_97748_, double p_97749_, int p_97750_) {
-        if(this.searchBox.mouseClicked(p_97748_, p_97749_, p_97750_)){
+    public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
+        if(this.searchBox.mouseClicked(pMouseX, pMouseY, pButton)){
             return true;
-        }else if(forwardButton.mouseClicked(p_97748_, p_97749_, p_97750_)){
+        }else if(forwardButton.mouseClicked(pMouseX, pMouseY, pButton)){
             page+=1;
             refreshButtons();
             return true;
-        }else if(backButton.mouseClicked(p_97748_, p_97749_, p_97750_)){
+        }else if(backButton.mouseClicked(pMouseX, pMouseY, pButton)){
             page-=1;
             refreshButtons();
             return true;
+        } else if(craftButton.mouseClicked(pMouseX, pMouseY, pButton)) {
+            return true;
         }
+
         for(CategoryButton button : tabButtons){
-            if(button.mouseClicked(p_97748_, p_97749_, p_97750_)){
+            if(button.mouseClicked(pMouseX, pMouseY, pButton)){
                 if(button.getCategory() != currentCategory) {
                     this.searchBox.setValue("");
                     this.page = 0;
@@ -233,12 +243,13 @@ public class SmithCraftScreen extends AbstractContainerScreen<SmithCraftMenu> {
             }
         }
         for(SmithRecipeButton button : buttonList) {
-            if (button.mouseClicked(p_97748_, p_97749_, p_97750_) && button.hasEnough) {
+            if (button.mouseClicked(pMouseX, pMouseY, pButton) && button.hasEnough) {
                 BlackSmithMod.sendToServer(new PlaceRecipePacket(button.getRecipe().getCraftedItem()));
+                this.containerMenu.selectedRecipe = button.getRecipe();
                 this.craftButton.active = true;
             }
         }
-        return super.mouseClicked(p_97748_, p_97749_, p_97750_);
+        return super.mouseClicked(pMouseX, pMouseY, pButton);
     }
 
     @Override

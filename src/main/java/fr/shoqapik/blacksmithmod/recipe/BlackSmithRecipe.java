@@ -1,7 +1,10 @@
 package fr.shoqapik.blacksmithmod.recipe;
 
+import fr.shoqapik.blacksmithmod.BlackSmithMod;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -46,7 +49,8 @@ public class BlackSmithRecipe {
         if(ForgeRegistries.ITEMS.containsKey(location)){
             return new ItemStack(ForgeRegistries.ITEMS.getDelegate(location).get().get());
         }else{
-            return new ItemStack(Blocks.BARRIER);
+            BlackSmithMod.LOGGER.error("Unknown item '{}' found in recipe for item '{}'.", key, craftedItem);
+            return new ItemStack(Blocks.STONE);
         }
     }
 
@@ -61,5 +65,26 @@ public class BlackSmithRecipe {
             }
         }
         return true;
+    }
+
+    public boolean hasItems(AbstractContainerMenu containerMenu){
+        for(Map.Entry<String, Integer> requieredItem: getRequiredItems().entrySet()){
+            if(countItem(containerMenu, getItemStack(requieredItem.getKey()).getItem()) < requieredItem.getValue()){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private int countItem(AbstractContainerMenu containerMenu, Item item) {
+        int amount = 0;
+
+        for(ItemStack itemStack : containerMenu.getItems()) {
+            if (itemStack.getItem().equals(item)) {
+                amount += itemStack.getCount();
+            }
+        }
+
+        return amount;
     }
 }

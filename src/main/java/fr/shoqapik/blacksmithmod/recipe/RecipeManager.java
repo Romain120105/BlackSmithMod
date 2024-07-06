@@ -71,6 +71,7 @@ public class RecipeManager extends SimpleJsonResourceReloadListener {
                 LOGGER.error("Parsing error loading recipe {}", resourcelocation, jsonparseexception);
             }
         }
+
     }
 
     public static List<BlackSmithRecipe> getRecipes() {

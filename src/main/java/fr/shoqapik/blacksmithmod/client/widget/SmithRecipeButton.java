@@ -40,7 +40,7 @@ public class SmithRecipeButton extends AbstractWidget {
         super(x, y, 25, 25, CommonComponents.EMPTY);
         this.recipe = recipe;
         if(recipe.getCraftedItem() == null) {
-            this.recipeStack = new ItemStack(Items.BARRIER);
+            this.recipeStack = new ItemStack(Items.STONE);
         }else {
             this.recipeStack = recipe.getCraftedItemStack();
         }
