@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "fr.shoqapik.btemobs.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "blacksmith.refmap.json",
+  "mixins": [
+  ],
+  "client": [
+    "GhostRecipeMixin",
+    "RecipeCollectionMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,0 +1,172 @@
+package fr.shoqapik.btemobs.client.gui;
+
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Matrix4f;
+import fr.shoqapik.btemobs.BteMobsMod;
+import fr.shoqapik.btemobs.packets.ActionPacket;
+import fr.shoqapik.btemobs.quests.QuestAnswer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+public class QuestDialogScreen extends Screen {
+
+    public static final ResourceLocation DIALOGS_LOCATION = new ResourceLocation(BteMobsMod.MODID, "textures/gui/dialogs.png");
+    protected int imageWidth = 254;
+    protected int imageHeight = 80;
+    protected int leftPos;
+    protected int topPos;
+
+    private int entityId;
+    private String entityname;
+    private List<String> dialogs = new ArrayList<>();
+    private boolean typing;
+    private int letterIndex;
+    private String currentLine = "";
+    private int page;
+
+    private List<QuestAnswer> questAnswers;
+    private List<Button> buttons = new ArrayList<>();
+    private boolean declined;
+
+/*    private Button acceptQuestButton;
+    private Button declineQuestButton;
+  */
+
+    public QuestDialogScreen(int entityId, String entityName, List<String> dialogs, List<QuestAnswer> questAnswers) {
+        super(Component.literal(entityName));
+        this.entityId = entityId;
+        this.entityname = entityName;
+        this.dialogs = dialogs;
+        this.questAnswers = questAnswers;
+    }
+
+    @Override
+    protected void init() {
+        super.init();
+        this.leftPos = (this.width - this.imageWidth) / 2;
+        this.topPos = (this.height - this.imageHeight) / 2;
+
+        int x = this.leftPos - (this.width / 8) + 254;
+        int y = this.height - this.imageHeight - 20;
+
+        int index = 0;
+        for(QuestAnswer questAnswer : questAnswers) {
+            if(index > 3) break;
+
+            buttons.add(this.addRenderableWidget(new Button(x, y + index * 25, 100, 20, Component.literal(questAnswer.getFormattedAwnser()), (p_95981_) -> {
+                if(!questAnswer.getAction().equals("wip")) {
+                    Minecraft.getInstance().setScreen(null);
+                    BteMobsMod.sendToServer(new ActionPacket(entityId, questAnswer.getAction()));
+                } else {
+                    this.dialogs.add("Not implemented yet! Come back later.");
+                    this.page = page + 1;
+                    this.declined = true;
+                    setButtonsEnabled(false);
+                    letterIndex = 0;
+                    currentLine = "";
+                }
+            })));
+
+            index++;
+        }
+        setButtonsEnabled(false);
+
+        super.init();
+
+    }
+
+    @Override
+    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        if (letterIndex < dialogs.get(page).length()) {
+            typing = true;
+            currentLine += dialogs.get(page).charAt(letterIndex);
+            letterIndex += 1;
+        } else {
+            typing = false;
+        }
+        this.setFocused(null);
+
+        // Render background
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderTexture(0, DIALOGS_LOCATION);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.enableDepthTest();
+
+        int x = this.leftPos - (this.width / 8);
+        int y = this.height - this.imageHeight - 25;
+
+        GuiComponent.blit(poseStack, x, y, 0, 0, imageWidth, imageHeight, 512, 512);
+
+        GuiComponent.drawCenteredString(poseStack, font, entityname, x + imageWidth / 2, y + 5, 16777215);
+
+        drawWordWrap(Component.literal(currentLine), x + 5, y + 25, 240, 16777215, font, poseStack);
+
+
+        poseStack.popPose();
+        if (!typing) {
+            if (page != dialogs.size() - 1 || declined) {
+                GuiComponent.drawCenteredString(poseStack, font, "Click anywhere to continue", x + imageWidth / 2, y - 13, 16777215);
+            } else {
+                setButtonsEnabled(true);
+            }
+        }
+
+        super.render(poseStack, mouseX, mouseY, partialTick);
+    }
+
+    public void drawWordWrap(FormattedText p_92858_, int p_92859_, int p_92860_, int p_92861_, int p_92862_, Font font, PoseStack stack) {
+        Matrix4f matrix4f = stack.last().pose();
+
+        for (FormattedCharSequence formattedcharsequence : font.split(p_92858_, p_92861_)) {
+            font.drawInternal(formattedcharsequence, (float) p_92859_, (float) p_92860_, p_92862_, matrix4f, false);
+            p_92860_ += 11;
+        }
+
+    }
+
+    @Override
+    public boolean mouseClicked(double p_94695_, double p_94696_, int p_94697_) {
+        if (typing) {
+            typing = false;
+            currentLine = dialogs.get(page);
+            letterIndex = currentLine.length();
+        } else if (page != dialogs.size() - 1) {
+            page += 1;
+            letterIndex = 0;
+            currentLine = "";
+        } else if (declined) {
+            Minecraft.getInstance().setScreen(null);
+        } else if (page == dialogs.size() - 1) {
+            return super.mouseClicked(p_94695_, p_94696_, p_94697_);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean isPauseScreen() {
+        return false;
+    }
+
+    public void setButtonsEnabled(boolean enabled) {
+        for (Button button : buttons) {
+            button.visible = enabled;
+            button.active = enabled;
+        }
+    }
+}
