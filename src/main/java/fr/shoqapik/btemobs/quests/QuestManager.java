@@ -20,14 +20,11 @@ public class QuestManager extends SimpleJsonResourceReloadListener {
 
     public QuestManager() {
         super(GSON, "quests");
-        /*BlackSmithRecipe recipe = new BlackSmithRecipe("minecraft:diamond_sword");
-        recipe.getRequiredItems().put("minecraft:stick", 34);
-        recipe.getRequiredItems().put("minecraft:diamond", 3);*/
     }
 
-    public static Quest getQuest(ResourceLocation entityId) {
+    public static Quest getQuest(ResourceLocation entityId, Quest.Type type) {
         for (Quest quest: quests) {
-            if(quest.getEntityId().toString().equals(entityId.toString())){
+            if(quest.getEntityId().toString().equals(entityId.toString()) && quest.getType() == type){
                 return quest;
             }
         }

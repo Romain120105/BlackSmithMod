@@ -6,6 +6,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -36,7 +39,10 @@ import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public abstract class BteAbstractEntity extends Mob implements IAnimatable {
 
@@ -49,6 +55,8 @@ public abstract class BteAbstractEntity extends Mob implements IAnimatable {
     private static final EntityDataAccessor<ItemStack> CRAFT_ITEM = SynchedEntityData.defineId(BteAbstractEntity.class, EntityDataSerializers.ITEM_STACK);;
 
     private int animationTickCount = 0;
+
+    private List<UUID> interactedPlayers = new ArrayList<>();
 
     public BteAbstractEntity(EntityType<? extends Mob> entityType, Level level) {
         super(entityType, level);
@@ -153,12 +161,20 @@ public abstract class BteAbstractEntity extends Mob implements IAnimatable {
         CompoundTag itemStack = new CompoundTag();
         getCraftItem().save(itemStack);
         pCompound.put("craftItem", itemStack);
+
+        ListTag listTag = new ListTag();
+        for(UUID interactedUuid : interactedPlayers) {
+            listTag.add(StringTag.valueOf(interactedUuid.toString()));
+        }
+        pCompound.put("interacted", listTag);
     }
 
     @Override
     public void readAdditionalSaveData(CompoundTag pCompound) {
         super.readAdditionalSaveData(pCompound);
         this.setCraftItem(ItemStack.of((CompoundTag) pCompound.get("craftItem")));
+        ListTag listTag = pCompound.getList("interacted", Tag.TAG_STRING);
+        interactedPlayers = new ArrayList<>(listTag.stream().map(tag -> UUID.fromString(tag.getAsString())).toList());
     }
 
     public boolean isWorkBlockEmpty() {
@@ -224,4 +240,7 @@ public abstract class BteAbstractEntity extends Mob implements IAnimatable {
         return this.factory;
     }
 
+    public List<UUID> getInteractedPlayers() {
+        return interactedPlayers;
+    }
 }

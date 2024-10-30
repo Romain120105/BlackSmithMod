@@ -7,6 +7,7 @@ import java.util.List;
 public class Quest {
 
     private String entityId;
+    private Quest.Type type;
     private List<String> dialogs;
 
     private List<QuestAnswer> answers;
@@ -21,11 +22,20 @@ public class Quest {
         return entityIdLocation;
     }
 
+    public Quest.Type getType() {
+        return type;
+    }
+
     public List<String> getDialogs() {
         return dialogs;
     }
 
     public List<QuestAnswer> getAnswers() {
         return answers;
+    }
+
+    public enum Type {
+        PRESENTATION,
+        TASKING
     }
 }
