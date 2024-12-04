@@ -1,7 +1,8 @@
 package fr.shoqapik.btemobs.entity;
 
 public enum BteNpcType {
-    BLACKSMITH(BlacksmithEntity.class);
+
+    BLACKSMITH(BlacksmithEntity.class), WARLOCK(WarlockEntity.class), EXPLORER(ExplorerEntity.class), DRUID(DruidEntity.class);
 
     private final Class<? extends BteAbstractEntity> entityClass;
 

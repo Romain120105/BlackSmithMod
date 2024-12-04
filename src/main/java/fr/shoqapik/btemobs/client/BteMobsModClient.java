@@ -6,7 +6,11 @@ import fr.shoqapik.btemobs.client.gui.QuestDialogScreen;
 import fr.shoqapik.btemobs.client.gui.BlacksmithCraftScreen;
 import fr.shoqapik.btemobs.client.renderer.blockentity.MagmaForgeBlockEntityRenderer;
 import fr.shoqapik.btemobs.client.renderer.entity.BlacksmithEntityRenderer;
+import fr.shoqapik.btemobs.client.renderer.entity.DruidEntityRenderer;
+import fr.shoqapik.btemobs.client.renderer.entity.ExplorerEntityRenderer;
+import fr.shoqapik.btemobs.client.renderer.entity.WarlockEntityRenderer;
 import fr.shoqapik.btemobs.entity.BteAbstractEntity;
+import fr.shoqapik.btemobs.entity.ExplorerEntity;
 import fr.shoqapik.btemobs.menu.BlacksmithCraftMenu;
 import fr.shoqapik.btemobs.packets.*;
 import fr.shoqapik.btemobs.registry.BteMobsBlockEntities;
@@ -39,6 +43,9 @@ public class BteMobsModClient {
     @SubscribeEvent
     public static void entityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(BteMobsEntities.BLACKSMITH_ENTITY.get(), BlacksmithEntityRenderer::new);
+        event.registerEntityRenderer(BteMobsEntities.WARLOCK_ENTITY.get(), WarlockEntityRenderer::new);
+        event.registerEntityRenderer(BteMobsEntities.EXPLORER_ENTITY.get(), ExplorerEntityRenderer::new);
+        event.registerEntityRenderer(BteMobsEntities.DRUID_ENTITY.get(), DruidEntityRenderer::new);
         event.registerBlockEntityRenderer(BteMobsBlockEntities.MAGMA_FORGE.get(), MagmaForgeBlockEntityRenderer::new);
     }
 

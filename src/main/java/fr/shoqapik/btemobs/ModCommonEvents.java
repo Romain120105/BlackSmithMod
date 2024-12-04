@@ -17,6 +17,9 @@ public class ModCommonEvents {
     @SubscribeEvent
     public static void entityAttributes(EntityAttributeCreationEvent event) {
         event.put(BteMobsEntities.BLACKSMITH_ENTITY.get(), BteAbstractEntity.getBlacksmithAttributes().build());
+        event.put(BteMobsEntities.WARLOCK_ENTITY.get(), BteAbstractEntity.getWarlockAttributes().build());
+        event.put(BteMobsEntities.EXPLORER_ENTITY.get(), BteAbstractEntity.getExplorerAttributes().build());
+        event.put(BteMobsEntities.DRUID_ENTITY.get(), BteAbstractEntity.getDruidAttributes().build());
     }
 
     @SubscribeEvent

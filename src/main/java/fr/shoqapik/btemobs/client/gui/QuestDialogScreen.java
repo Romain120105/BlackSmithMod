@@ -16,6 +16,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +26,7 @@ import java.util.UUID;
 public class QuestDialogScreen extends Screen {
 
     public static final ResourceLocation DIALOGS_LOCATION = new ResourceLocation(BteMobsMod.MODID, "textures/gui/dialogs.png");
+    private static final Logger log = LoggerFactory.getLogger(QuestDialogScreen.class);
     protected int imageWidth = 254;
     protected int imageHeight = 80;
     protected int leftPos;
@@ -101,7 +104,20 @@ public class QuestDialogScreen extends Screen {
 
         // Render background
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderTexture(0, DIALOGS_LOCATION);
+
+        if (entityname.equals("Noah")){
+            RenderSystem.setShaderTexture(0, new ResourceLocation(BteMobsMod.MODID, "textures/gui/dialogs_noah.png"));
+        }
+        else if (entityname.equals("Antonio")){
+            RenderSystem.setShaderTexture(0, new ResourceLocation(BteMobsMod.MODID, "textures/gui/dialogs_antonio.png"));
+        }
+        else if (entityname.equals("Oriana")){
+            RenderSystem.setShaderTexture(0, new ResourceLocation(BteMobsMod.MODID, "textures/gui/dialogs_oriana.png"));
+        }
+        else{
+            RenderSystem.setShaderTexture(0, DIALOGS_LOCATION);
+        }
+
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
         RenderSystem.enableBlend();
