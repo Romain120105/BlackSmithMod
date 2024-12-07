@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Matrix4f;
 import fr.shoqapik.btemobs.BteMobsMod;
+import fr.shoqapik.btemobs.button.CustomButton;
 import fr.shoqapik.btemobs.packets.ActionPacket;
 import fr.shoqapik.btemobs.quests.QuestAnswer;
 import net.minecraft.client.Minecraft;
@@ -44,6 +45,9 @@ public class QuestDialogScreen extends Screen {
     private List<Button> buttons = new ArrayList<>();
     private boolean declined;
 
+    private ResourceLocation texture;
+    private ResourceLocation texture2;
+
 /*    private Button acceptQuestButton;
     private Button declineQuestButton;
   */
@@ -66,29 +70,88 @@ public class QuestDialogScreen extends Screen {
         int y = this.height - this.imageHeight - 20;
 
         int index = 0;
-        for(QuestAnswer questAnswer : questAnswers) {
-            if(index > 3) break;
+        for (QuestAnswer questAnswer : questAnswers) {
+            if (index > 3) break;
 
-            buttons.add(this.addRenderableWidget(new Button(x, y + index * 25, 100, 20, Component.literal(questAnswer.getFormattedAwnser()), (p_95981_) -> {
-                if(!questAnswer.getAction().equals("wip")) {
-                    Minecraft.getInstance().setScreen(null);
-                    BteMobsMod.sendToServer(new ActionPacket(entityId, questAnswer.getAction()));
-                } else {
-                    this.dialogs.add("Not implemented yet! Come back later.");
-                    this.page = page + 1;
-                    this.declined = true;
-                    setButtonsEnabled(false);
-                    letterIndex = 0;
-                    currentLine = "";
+            texture2 = new ResourceLocation(BteMobsMod.MODID, "textures/gui/buttons/extra_textures/cross_anna.png");
+
+            // Determina la textura según entityname
+            if (entityname.equals("Noah")) {
+                texture = new ResourceLocation(BteMobsMod.MODID, "textures/gui/buttons/button_anna.png");
+                if (questAnswer.getAction().equals("open_craft")){
+                    texture2 = new ResourceLocation(BteMobsMod.MODID, "textures/gui/buttons/extra_textures/craft_anna.png");
                 }
-            })));
+                else if (questAnswer.getAction().equals("open_repair")){
+                    texture2 = new ResourceLocation(BteMobsMod.MODID, "textures/gui/buttons/extra_textures/repair_anna.png");
+                }
+                else if (questAnswer.getAction().equals("wip")){
+                    texture2 = new ResourceLocation(BteMobsMod.MODID, "textures/gui/buttons/extra_textures/cross_anna.png");
+                }
+
+            } else if (entityname.equals("Antonio")) {
+                texture = new ResourceLocation(BteMobsMod.MODID, "textures/gui/buttons/button_anna.png");
+                if (questAnswer.getAction().equals("open_craft")){
+                    texture2 = new ResourceLocation(BteMobsMod.MODID, "textures/gui/buttons/extra_textures/craft_anna.png");
+                }
+                else if (questAnswer.getAction().equals("open_repair")){
+                    texture2 = new ResourceLocation(BteMobsMod.MODID, "textures/gui/buttons/extra_textures/repair_anna.png");
+                }
+                else if (questAnswer.getAction().equals("wip")){
+                    texture2 = new ResourceLocation(BteMobsMod.MODID, "textures/gui/buttons/extra_textures/cross_anna.png");
+                }
+
+            } else if (entityname.equals("Oriana")) {
+                texture = new ResourceLocation(BteMobsMod.MODID, "textures/gui/buttons/button_anna.png");
+                if (questAnswer.getAction().equals("open_craft")){
+                    texture2 = new ResourceLocation(BteMobsMod.MODID, "textures/gui/buttons/extra_textures/craft_anna.png");
+                }
+                else if (questAnswer.getAction().equals("open_repair")){
+                    texture2 = new ResourceLocation(BteMobsMod.MODID, "textures/gui/buttons/extra_textures/repair_anna.png");
+                }
+                else if (questAnswer.getAction().equals("wip")){
+                    texture2 = new ResourceLocation(BteMobsMod.MODID, "textures/gui/buttons/extra_textures/cross_anna.png");
+                }
+
+            } else {
+                texture = new ResourceLocation(BteMobsMod.MODID, "textures/gui/buttons/button_anna.png");
+                if (questAnswer.getAction().equals("open_craft")){
+                    texture2 = new ResourceLocation(BteMobsMod.MODID, "textures/gui/buttons/extra_textures/craft_anna.png");
+                }
+                else if (questAnswer.getAction().equals("open_repair")){
+                    texture2 = new ResourceLocation(BteMobsMod.MODID, "textures/gui/buttons/extra_textures/repair_anna.png");
+                }
+                else if (questAnswer.getAction().equals("wip")){
+                    texture2 = new ResourceLocation(BteMobsMod.MODID, "textures/gui/buttons/extra_textures/cross_anna.png");
+                }
+            }
+
+            buttons.add(this.addRenderableWidget(new CustomButton(
+                    texture,texture2,
+                    x,
+                    y + index * 25,
+                    100,
+                    20,
+                    Component.literal(questAnswer.getFormattedAwnser()),
+                    (p_95981_) -> {
+                        if (!questAnswer.getAction().equals("wip")) {
+                            Minecraft.getInstance().setScreen(null);
+                            BteMobsMod.sendToServer(new ActionPacket(entityId, questAnswer.getAction()));
+                        } else {
+                            this.dialogs.add("Not implemented yet! Come back later.");
+                            this.page = page + 1;
+                            this.declined = true;
+                            setButtonsEnabled(false);
+                            letterIndex = 0;
+                            currentLine = "";
+                        }
+                    }
+            )));
 
             index++;
         }
         setButtonsEnabled(false);
 
         super.init();
-
     }
 
     @Override
@@ -129,9 +192,9 @@ public class QuestDialogScreen extends Screen {
 
         GuiComponent.blit(poseStack, x, y, 0, 0, imageWidth, imageHeight, 512, 512);
 
-        GuiComponent.drawCenteredString(poseStack, font, entityname, x + imageWidth / 2, y + 5, 16777215);
+        //GuiComponent.drawCenteredString(poseStack, font, entityname, x + imageWidth / 2, y + 5, 16777215);
 
-        drawWordWrap(Component.literal(currentLine), x + 5, y + 25, 240, 16777215, font, poseStack);
+        drawWordWrap(Component.literal(currentLine), x + 17, y + 30, 240 - 20, 16777215, font, poseStack);
 
 
         poseStack.popPose();
