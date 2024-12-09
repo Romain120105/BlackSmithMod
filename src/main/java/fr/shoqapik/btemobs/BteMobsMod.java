@@ -6,6 +6,7 @@ import fr.shoqapik.btemobs.menu.provider.BlacksmithCraftProvider;
 import fr.shoqapik.btemobs.packets.*;
 import fr.shoqapik.btemobs.recipe.api.BteAbstractRecipe;
 import fr.shoqapik.btemobs.registry.*;
+import fr.shoqapik.btemobs.sound.SoundManager;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -57,6 +58,9 @@ public class BteMobsMod {
         BteMobsEntities.register(bus);
         BteMobsRecipeSerializers.register(bus);
         BteMobsRecipeTypes.register(bus);
+
+        SoundManager.SOUND_EVENTS.register(bus);
+
         INSTANCE.registerMessage(0, ShowDialogPacket.class, ShowDialogPacket::encode, ShowDialogPacket::decode, ShowDialogPacket::handle);
         INSTANCE.registerMessage(1, ActionPacket.class, ActionPacket::encode, ActionPacket::decode, ActionPacket::handle);
         INSTANCE.registerMessage(2, CheckUnlockRecipePacket.class, CheckUnlockRecipePacket::encode, CheckUnlockRecipePacket::decode, CheckUnlockRecipePacket::handle);

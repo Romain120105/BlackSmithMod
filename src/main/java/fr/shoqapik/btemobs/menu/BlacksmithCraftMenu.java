@@ -22,6 +22,17 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.UpgradeRecipe;
 import net.minecraftforge.network.PacketDistributor;
+import software.bernie.geckolib3.core.builder.Animation;
+import software.bernie.geckolib3.file.AnimationFile;
+import software.bernie.geckolib3.resource.GeckoLibCache;
+
+import software.bernie.geckolib3.core.IAnimatable;
+import software.bernie.geckolib3.core.IAnimatableModel;
+import software.bernie.geckolib3.core.AnimationState;
+import software.bernie.geckolib3.core.ConstantValue;
+import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import software.bernie.geckolib3.core.builder.ILoopType;
+import software.bernie.geckolib3.core.keyframe.AnimationPoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -253,6 +264,7 @@ public class BlacksmithCraftMenu extends RecipeBookMenu<BlacksmithCraftContainer
                 Inventory inventory = serverPlayer.getInventory();
                 if (inventory.player instanceof ServerPlayer) {
                     this.craftSlots.removeItem(i, this.craftSlots.getItem(i).getCount());
+
                 }
             }
 

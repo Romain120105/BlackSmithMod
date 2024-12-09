@@ -1,6 +1,10 @@
 package fr.shoqapik.btemobs.entity;
 
+import fr.shoqapik.btemobs.BteMobsMod;
 import fr.shoqapik.btemobs.blockentity.MagmaForgeBlockEntity;
+import fr.shoqapik.btemobs.sound.SoundManager;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -13,13 +17,16 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.*;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.schedule.Timeline;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -29,6 +36,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.registries.ForgeRegistries;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
@@ -43,6 +51,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import software.bernie.geckolib3.core.IAnimatable;
+import software.bernie.geckolib3.core.PlayState;
+import net.minecraft.world.level.Level;
+
+import net.minecraft.world.entity.Entity;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.core.BlockPos;
+
 
 public abstract class BteAbstractEntity extends Mob implements IAnimatable {
 
@@ -112,6 +133,7 @@ public abstract class BteAbstractEntity extends Mob implements IAnimatable {
             if(!this.level.isClientSide) {
                 if(animationTickCount == 54 || animationTickCount == 88 || animationTickCount == 115) {
                     ((ServerLevel)this.level).sendParticles(ParticleTypes.CRIT, workBlock.getX() + 0.5D, workBlock.getY() + 1.1D, workBlock.getZ() + 0.5D, 6, 0.1D, 0.3D, 0.1D, 0.1D);
+                    ((ServerLevel)this.level).playSound(null, workBlock, SoundManager.HAMMER.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
                 }
             }
 
@@ -233,8 +255,16 @@ public abstract class BteAbstractEntity extends Mob implements IAnimatable {
     }
 
     protected PlayState idleAnimationController(AnimationEvent<BteAbstractEntity> event) {
+
+        // Obtener el nombre de la animación actual
+        String currentAnimation = event.getController().getCurrentAnimation() != null
+                ? event.getController().getCurrentAnimation().animationName
+                : "None";
+
+
         if(isCrafting()) {
             event.getController().setAnimation(CRAFTING_ANIMATION);
+
             return PlayState.CONTINUE;
         }
 
@@ -244,6 +274,15 @@ public abstract class BteAbstractEntity extends Mob implements IAnimatable {
         }
 
         return PlayState.STOP;
+    }
+
+    // Metodo para reproducir el sonido usando el AnimationEvent
+    private void playSounds(AnimationEvent<?> event, String name) {
+
+        if (this.level.isClientSide()) {
+            System.out.println("Reproduciendo sonido en: " + this.getX() + ", " + this.getY() + ", " + this.getZ());
+            this.playSound(SoundManager.HAMMER.get(), 1.0F, 1.0F);
+        }
     }
 
 
