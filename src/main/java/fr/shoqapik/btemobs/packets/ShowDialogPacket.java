@@ -1,6 +1,7 @@
 package fr.shoqapik.btemobs.packets;
 
 import fr.shoqapik.btemobs.client.BteMobsModClient;
+import fr.shoqapik.btemobs.quests.Quest;
 import fr.shoqapik.btemobs.quests.QuestAnswer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
@@ -15,14 +16,12 @@ import java.util.function.Supplier;
 public class ShowDialogPacket {
     public int entityId;
     public String entityName;
-    public List<String> dialogs;
-    public List<QuestAnswer> answers;
+    public Quest quest;
 
-    public ShowDialogPacket(int entityId, String entityName, List<String> dialogs, List<QuestAnswer> answers) {
+    public ShowDialogPacket(int entityId, String entityName, Quest quest) {
         this.entityId = entityId;
         this.entityName = entityName;
-        this.dialogs = dialogs;
-        this.answers = answers;
+        this.quest = quest;
     }
 
     public static void handle(ShowDialogPacket msg, Supplier<NetworkEvent.Context> ctx) {
@@ -35,33 +34,15 @@ public class ShowDialogPacket {
 
     public static ShowDialogPacket decode(FriendlyByteBuf packetBuffer) {
         int entityId = packetBuffer.readInt();
-        String entityName =packetBuffer.readUtf();
-        int dialogNumber = packetBuffer.readInt();
-        List<String> dialogs =new ArrayList<>();
-        for(int i =0; i < dialogNumber; i++){
-            dialogs.add(packetBuffer.readUtf());
-        }
-
-        int answersNumber = packetBuffer.readInt();
-        List<QuestAnswer> answers =new ArrayList<>();
-        for(int i =0; i < answersNumber; i++){
-            answers.add(new QuestAnswer(packetBuffer.readUtf(), packetBuffer.readUtf()));
-        }
-        return new ShowDialogPacket(entityId, entityName, dialogs, answers);
+        String entityName = packetBuffer.readUtf();
+        Quest quest = Quest.decode(packetBuffer);
+        return new ShowDialogPacket(entityId, entityName, quest);
     }
 
     public static void encode(ShowDialogPacket msg, FriendlyByteBuf packetBuffer) {
         packetBuffer.writeInt(msg.entityId);
         packetBuffer.writeUtf(msg.entityName);
-        packetBuffer.writeInt(msg.dialogs.size());
-        for (String s: msg.dialogs) {
-            packetBuffer.writeUtf(s);
-        }
-        packetBuffer.writeInt(msg.answers.size());
-        for (QuestAnswer answer: msg.answers) {
-            packetBuffer.writeUtf(answer.getFormattedAwnser());
-            packetBuffer.writeUtf(answer.getAction());
-        }
+        Quest.encode(msg.quest, packetBuffer);
     }
 
 }

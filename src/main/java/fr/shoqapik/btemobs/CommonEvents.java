@@ -13,9 +13,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import java.util.UUID;
-import java.util.stream.Collectors;
-
 @Mod.EventBusSubscriber(modid = BteMobsMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class CommonEvents {
 
@@ -30,7 +27,7 @@ public class CommonEvents {
             }
             Quest quest = QuestManager.getQuest(entityId, type);
             if(quest != null) {
-                BteMobsMod.sendToClient(new ShowDialogPacket(event.getTarget().getId(), event.getTarget().getDisplayName().getString(), quest.getDialogs(), quest.getAnswers()), (ServerPlayer) event.getEntity());
+                BteMobsMod.sendToClient(new ShowDialogPacket(event.getTarget().getId(), event.getTarget().getDisplayName().getString(), quest), (ServerPlayer) event.getEntity());
                 if(event.getTarget() instanceof BteAbstractEntity) ((BteAbstractEntity) event.getTarget()).getInteractedPlayers().add(event.getEntity().getUUID());
             }
         }
@@ -39,8 +36,6 @@ public class CommonEvents {
     @SubscribeEvent
     public static void addQuestsData(AddReloadListenerEvent event){
         event.addListener(new QuestManager());
-       // event.addListener(new RecipeManager());
     }
-
 
 }

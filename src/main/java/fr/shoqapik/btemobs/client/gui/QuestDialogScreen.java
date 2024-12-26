@@ -6,6 +6,7 @@ import com.mojang.math.Matrix4f;
 import fr.shoqapik.btemobs.BteMobsMod;
 import fr.shoqapik.btemobs.button.CustomButton;
 import fr.shoqapik.btemobs.packets.ActionPacket;
+import fr.shoqapik.btemobs.quests.Quest;
 import fr.shoqapik.btemobs.quests.QuestAnswer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -13,12 +14,19 @@ import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.RandomSource;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import software.bernie.shadowed.eliotlash.mclib.math.functions.limit.Min;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,13 +43,13 @@ public class QuestDialogScreen extends Screen {
 
     private int entityId;
     private String entityname;
-    private List<String> dialogs = new ArrayList<>();
+    private Quest quest;
     private boolean typing;
     private int letterIndex;
     private String currentLine = "";
     private int page;
+    private ResourceLocation currentDialogSound;
 
-    private List<QuestAnswer> questAnswers;
     private List<Button> buttons = new ArrayList<>();
     private boolean declined;
 
@@ -52,12 +60,11 @@ public class QuestDialogScreen extends Screen {
     private Button declineQuestButton;
   */
 
-    public QuestDialogScreen(int entityId, String entityName, List<String> dialogs, List<QuestAnswer> questAnswers) {
+    public QuestDialogScreen(int entityId, String entityName, Quest quest) {
         super(Component.literal(entityName));
         this.entityId = entityId;
         this.entityname = entityName;
-        this.dialogs = dialogs;
-        this.questAnswers = questAnswers;
+        this.quest = quest;
     }
 
     @Override
@@ -70,7 +77,7 @@ public class QuestDialogScreen extends Screen {
         int y = this.height - this.imageHeight - 20;
 
         int index = 0;
-        for (QuestAnswer questAnswer : questAnswers) {
+        for (QuestAnswer questAnswer : this.quest.getAnswers()) {
             if (index > 3) break;
 
             texture2 = new ResourceLocation(BteMobsMod.MODID, "textures/gui/buttons/extra_textures/cross_anna.png");
@@ -137,7 +144,7 @@ public class QuestDialogScreen extends Screen {
                             Minecraft.getInstance().setScreen(null);
                             BteMobsMod.sendToServer(new ActionPacket(entityId, questAnswer.getAction()));
                         } else {
-                            this.dialogs.add("Not implemented yet! Come back later.");
+                            this.quest.getDialogs().add("Not implemented yet! Come back later.");
                             this.page = page + 1;
                             this.declined = true;
                             setButtonsEnabled(false);
@@ -156,9 +163,18 @@ public class QuestDialogScreen extends Screen {
 
     @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        if (letterIndex < dialogs.get(page).length()) {
+        if (letterIndex < this.quest.getDialogs().get(page).length()) {
+            if(!typing && page < this.quest.getDialogSounds().size()) {
+                ResourceLocation soundLocation = this.quest.getDialogSounds().get(page);
+                double x = Minecraft.getInstance().player.getX();
+                double y = Minecraft.getInstance().player.getY();
+                double z = Minecraft.getInstance().player.getZ();
+                this.minecraft.getSoundManager().play(new SimpleSoundInstance(soundLocation, SoundSource.NEUTRAL, 1.0f, 1.0f, SoundInstance.createUnseededRandom(), false, 0, SoundInstance.Attenuation.LINEAR, x, y, z, false));
+                this.currentDialogSound = soundLocation;
+            }
+
             typing = true;
-            currentLine += dialogs.get(page).charAt(letterIndex);
+            currentLine += this.quest.getDialogs().get(page).charAt(letterIndex);
             letterIndex += 1;
         } else {
             typing = false;
@@ -199,7 +215,7 @@ public class QuestDialogScreen extends Screen {
 
         poseStack.popPose();
         if (!typing) {
-            if (page != dialogs.size() - 1 || declined) {
+            if (page != this.quest.getDialogs().size() - 1 || declined) {
                 GuiComponent.drawCenteredString(poseStack, font, "Click anywhere to continue", x + imageWidth / 2, y - 13, 16777215);
             } else {
                 setButtonsEnabled(true);
@@ -223,15 +239,21 @@ public class QuestDialogScreen extends Screen {
     public boolean mouseClicked(double p_94695_, double p_94696_, int p_94697_) {
         if (typing) {
             typing = false;
-            currentLine = dialogs.get(page);
+            currentLine = this.quest.getDialogs().get(page);
             letterIndex = currentLine.length();
-        } else if (page != dialogs.size() - 1) {
+            if(currentDialogSound != null) {
+                Minecraft.getInstance().getSoundManager().stop(currentDialogSound, SoundSource.NEUTRAL);
+            }
+        } else if (page != this.quest.getDialogs().size() - 1) {
             page += 1;
             letterIndex = 0;
             currentLine = "";
+            if(currentDialogSound != null) {
+                Minecraft.getInstance().getSoundManager().stop(currentDialogSound, SoundSource.NEUTRAL);
+            }
         } else if (declined) {
             Minecraft.getInstance().setScreen(null);
-        } else if (page == dialogs.size() - 1) {
+        } else if (page == this.quest.getDialogs().size() - 1) {
             return super.mouseClicked(p_94695_, p_94696_, p_94697_);
         }
         return true;
