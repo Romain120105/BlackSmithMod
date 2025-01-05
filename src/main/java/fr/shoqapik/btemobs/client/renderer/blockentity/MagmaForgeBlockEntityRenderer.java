@@ -2,8 +2,7 @@ package fr.shoqapik.btemobs.client.renderer.blockentity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
-import fr.shoqapik.btemobs.blockentity.MagmaForgeBlockEntity;
-import net.minecraft.client.Minecraft;
+import fr.shoqapik.btemobs.blockentity.BteAbstractWorkBlockEntity;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -12,7 +11,7 @@ import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.item.ItemStack;
 
-public class MagmaForgeBlockEntityRenderer implements BlockEntityRenderer<MagmaForgeBlockEntity> {
+public class MagmaForgeBlockEntityRenderer implements BlockEntityRenderer<BteAbstractWorkBlockEntity> {
 
     private final ItemRenderer itemRenderer;
 
@@ -21,9 +20,9 @@ public class MagmaForgeBlockEntityRenderer implements BlockEntityRenderer<MagmaF
     }
 
     @Override
-    public void render(MagmaForgeBlockEntity pBlockEntity, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBufferSource, int pPackedLight, int pPackedOverlay) {
-        if(pBlockEntity.getCapability(MagmaForgeBlockEntity.ITEM_HANDLER).resolve().isPresent()) {
-            ItemStack stack = pBlockEntity.getCapability(MagmaForgeBlockEntity.ITEM_HANDLER).resolve().get().getStackInSlot(0);
+    public void render(BteAbstractWorkBlockEntity pBlockEntity, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBufferSource, int pPackedLight, int pPackedOverlay) {
+        if(pBlockEntity.getCapability(BteAbstractWorkBlockEntity.ITEM_HANDLER).resolve().isPresent()) {
+            ItemStack stack = pBlockEntity.getCapability(BteAbstractWorkBlockEntity.ITEM_HANDLER).resolve().get().getStackInSlot(0);
 
             if(stack != ItemStack.EMPTY) {
                 pPoseStack.pushPose();

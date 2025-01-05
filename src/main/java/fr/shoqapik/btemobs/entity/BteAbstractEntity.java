@@ -1,10 +1,7 @@
 package fr.shoqapik.btemobs.entity;
 
-import fr.shoqapik.btemobs.BteMobsMod;
-import fr.shoqapik.btemobs.blockentity.MagmaForgeBlockEntity;
+import fr.shoqapik.btemobs.blockentity.BteAbstractWorkBlockEntity;
 import fr.shoqapik.btemobs.sound.SoundManager;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -17,16 +14,13 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.*;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.schedule.Timeline;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -36,7 +30,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.registries.ForgeRegistries;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
@@ -52,17 +45,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.PlayState;
-import net.minecraft.world.level.Level;
-
-import net.minecraft.world.entity.Entity;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.core.BlockPos;
 
 
 public abstract class BteAbstractEntity extends Mob implements IAnimatable {
@@ -129,6 +112,7 @@ public abstract class BteAbstractEntity extends Mob implements IAnimatable {
             this.lookAt(EntityAnchorArgument.Anchor.FEET, new Vec3(workBlock.getX(), workBlock.getY(), workBlock.getZ()));
         }
 
+        // TODO: Most probably this will have to be moved to the specific entity. As different entities have different ways of crafting.
         if(isCrafting()) {
             if(!this.level.isClientSide) {
                 if(animationTickCount == 54 || animationTickCount == 88 || animationTickCount == 115) {
@@ -139,8 +123,8 @@ public abstract class BteAbstractEntity extends Mob implements IAnimatable {
 
             if(animationTickCount == 115) {
                 BlockEntity blockEntity = this.level.getBlockEntity(this.workBlock);
-                if(blockEntity instanceof MagmaForgeBlockEntity) {
-                    blockEntity.getCapability(MagmaForgeBlockEntity.ITEM_HANDLER).resolve().get().insertItem(0, getCraftItem().copy(), false);
+                if(blockEntity instanceof BteAbstractWorkBlockEntity) {
+                    blockEntity.getCapability(BteAbstractWorkBlockEntity.ITEM_HANDLER).resolve().get().insertItem(0, getCraftItem().copy(), false);
                 }
                 setCraftItem(ItemStack.EMPTY);
             }
@@ -215,7 +199,7 @@ public abstract class BteAbstractEntity extends Mob implements IAnimatable {
         if(getCraftItem().getItem() == Items.AIR) {
             if(workBlock != null) {
                 BlockEntity blockEntity = this.level.getBlockEntity(workBlock);
-                Optional<IItemHandler> optional = blockEntity.getCapability(MagmaForgeBlockEntity.ITEM_HANDLER).resolve();
+                Optional<IItemHandler> optional = blockEntity.getCapability(BteAbstractWorkBlockEntity.ITEM_HANDLER).resolve();
                 if(optional.isPresent()) {
                     if(optional.get().getStackInSlot(0).getItem() == Items.AIR) {
                         return true;
@@ -249,22 +233,18 @@ public abstract class BteAbstractEntity extends Mob implements IAnimatable {
 
     // Animation Setup
 
-    @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<>(this, "Idling", 5, this::idleAnimationController));
+    protected AnimationController<? extends BteAbstractEntity> getIdleAnimationController(AnimationData animationData) {
+        return new AnimationController<>(this, "Idling", 5, this::idleAnimation);
     }
 
-    protected PlayState idleAnimationController(AnimationEvent<BteAbstractEntity> event) {
+    @Override
+    public void registerControllers(AnimationData animationData) {
+        animationData.addAnimationController(getIdleAnimationController(animationData));
+    }
 
-        // Obtener el nombre de la animación actual
-        String currentAnimation = event.getController().getCurrentAnimation() != null
-                ? event.getController().getCurrentAnimation().animationName
-                : "None";
-
-
+    protected PlayState idleAnimation(AnimationEvent<BteAbstractEntity> event) {
         if(isCrafting()) {
             event.getController().setAnimation(CRAFTING_ANIMATION);
-
             return PlayState.CONTINUE;
         }
 

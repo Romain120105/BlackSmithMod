@@ -10,16 +10,16 @@ public class WarlockModel extends AnimatedGeoModel<WarlockEntity> {
 
     @Override
     public ResourceLocation getModelResource(WarlockEntity warlockEntity) {
-        return new ResourceLocation(BteMobsMod.MODID, "geo/blacksmith.geo.json");
+        return new ResourceLocation(BteMobsMod.MODID, "geo/warlock.geo.json");
     }
 
     @Override
     public ResourceLocation getTextureResource(WarlockEntity warlockEntity) {
-        return new ResourceLocation(BteMobsMod.MODID, "textures/entity/blacksmith.png");
+        return new ResourceLocation(BteMobsMod.MODID, "textures/entity/warlock.png");
     }
 
     @Override
     public ResourceLocation getAnimationResource(WarlockEntity warlockEntity) {
-        return new ResourceLocation(BteMobsMod.MODID, "animations/blacksmith.animation.json");
+        return new ResourceLocation(BteMobsMod.MODID, "animations/warlock.animation.json");
     }
 }
