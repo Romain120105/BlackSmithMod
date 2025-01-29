@@ -66,14 +66,6 @@ public abstract class BteAbstractEntity extends Mob implements IAnimatable {
         super(entityType, level);
     }
 
-    /*@Override
-    protected InteractionResult mobInteract(Player p_21472_, InteractionHand p_21473_) {
-        if(!p_21472_.isLocalPlayer()) {
-            return InteractionResult.SUCCESS;
-        }
-        return InteractionResult.PASS;
-    }*/
-
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
