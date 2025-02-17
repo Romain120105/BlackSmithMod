@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "bte_mobs:block/magma_forge",
+      "y": 270
+    },
+    "facing=north": {
+      "model": "bte_mobs:block/magma_forge",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "bte_mobs:block/magma_forge"
+    },
+    "facing=west": {
+      "model": "bte_mobs:block/magma_forge",
+      "y": 90
+    }
+  }
+}

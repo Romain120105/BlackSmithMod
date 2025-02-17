@@ -1,0 +1,9 @@
+{
+  "hammer": {
+    "category" : "blocks",
+    "subtitle" : "bte_mobs.hammer",
+    "sounds": [
+      "bte_mobs:hammer"
+    ]
+  }
+}
